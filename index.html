@@ -3,9 +3,9 @@
     <head>
         <meta charset="utf-8">
         <title>Pie Charts</title>
-        <link rel="stylesheet" type="text/css" href="css/style.css">
+    
         <!-- Stylesheet -->
-        <script src="//d3js.org/d3.v4.min.js" charset="utf-8"></script>
+        
         <link rel="stylesheet" href="style.css">
         <!-- Load D3 -->
        
@@ -26,7 +26,7 @@
     <body style="background-color:lightgreen;">
         <h1 style="color:black;text-align:center;">Δεδομένα & Στατιστικά Στερεών Αποβλήτων 2004-2014. (ΕΛΣΤΑΤ 2017)</h1>
     <div class=""></div></h1>
-    
+      
     
     <table style="width:100%">
   <caption style="font-size:40px;">Σύσταση Στερεών Αποβλήτων σε τόνους</caption>
@@ -121,16 +121,101 @@
     <td>88.8%</td> 
   </tr>
    </table>
-      
-    
+<style> /* set the CSS */
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
 </style>
-    
+<body>
+
+<!-- load the d3.js library -->    	
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+// set the dimensions and margins of the graph
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width2 = 960 - margin.left - margin.right,
+    height2 = 500 - margin.top - margin.bottom;
+// parse the date / time
+var parseTime = d3.timeParse("%Y");
+// set the ranges
+var x = d3.scaleTime().range([0, width2]);
+var y = d3.scaleLinear().range([height2, 0]);
+// define the line
+var valueline = d3.line()
+    .x(function(d) { return x(d.Date); })
+    .y(function(d) { return y(d.Imports); });
+// define the line
+var valueline2 = d3.line()
+    .x(function(d) { return x(d.Date); })
+    .y(function(d) { return y(d.Exports); });
+  
+// append the svg obgect to the body of the page
+// appends a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+var svg3 = d3.select("body").append("svg")
+    .attr("width", width2 + margin.left + margin.right)
+    .attr("height", height2 + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+function draw(data, country) {
+  
+  var data = data[country];
+  
+  // format the data
+  data.forEach(function(d) {
+      d.Date = parseTime(d.Date);
+      d.Imports = +d.Imports;
+      d.Exports = +d.Exports;
+  });
+  
+  // sort years ascending
+  data.sort(function(a, b){
+    return a["Date"]-b["Date"];
+	})
+ 
+  // Scale the range of the data
+  x.domain(d3.extent(data, function(d) { return d.Date; }));
+  y.domain([0, d3.max(data, function(d) {
+	  return Math.max(d.Imports, d.Exports); })]);
+  
+  // Add the valueline path.
+  svg3.append("path")
+      .data([data])
+      .attr("class", "line")
+      .attr("d", valueline);
+  // Add the valueline path.
+  svg3.append("path")
+      .data([data])
+      .attr("class", "line")
+      .attr("d", valueline2);  
+  // Add the X Axis
+  svg3.append("g")
+      .attr("transform", "translate(0," + height2 + ")")
+      .call(d3.axisBottom(x));
+  // Add the Y Axis
+  svg3.append("g")
+      .call(d3.axisLeft(y));
+  }
+// Get the data
+d3.json("dataset.json", function(error, data) {
+  if (error) throw error;
+  
+  // trigger render
+  draw(data, "Afghanistan");
+});
+</script>
+        
         <h3>Απεικόνιση Στατιστικών Δεδομένων των Στερεών Απολήτων</h3>
         
-    
+     
         <script  src="pie.js"></script>
-         <script type="text/javascript" src="js/pie.js"></script
-       
+
+       <script src="//d3js.org/d3.v3.js"></script>
+        <script src="//d3js.org/d3.v4.min.js" charset="utf-8"></script>
+
     <span>ΠΗΓΗ:</span>
   <a href="http://www.statistics.gr/el/statistics/-/publication/SOP06/-">ΕΛΣΤΑΤ</a>
     </body>
